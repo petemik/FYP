@@ -1,4 +1,4 @@
-function output = multiEqs(t, y)
+function output = multiEqs(t, y, masses)
 n_bodies = size(y, 1)/4;
 output = zeros(4*n_bodies, 1);
 % Here xx and yy represent distance of each planet to the Sun.
@@ -8,8 +8,9 @@ for i = 0:n_bodies-1
     xx(i+1) = y(4*i + 1);
     yy(i+1) = y(4*i + 2);
 end
-M = 1.989e30;
-m = 5e24;
+M = masses(1);
+%Remove first element
+masses(1) = [];
 G = 6.674e-11;
 r = (xx.^2+yy.^2).^0.5;
 
@@ -21,9 +22,9 @@ Fy = zeros(n_bodies, n_bodies);
 for i=1:n_bodies
     for j=1:n_bodies
         if i ~= j
-            Fx(i, j) = -G.*m.*(xx(i)-xx(j)).*(((xx(i)-xx(j)).^2 ...
+            Fx(i, j) = -G.*masses(j).*(xx(i)-xx(j)).*(((xx(i)-xx(j)).^2 ...
                                             + (yy(i)-yy(j)).^2).^(-3/2));
-            Fy(i, j) = -G.*m.*(yy(i)-yy(j)).*(((xx(i)-xx(j)).^2 ...
+            Fy(i, j) = -G.*masses(j).*(yy(i)-yy(j)).*(((xx(i)-xx(j)).^2 ...
                                             + (yy(i)-yy(j)).^2).^(-3/2));
         else
         end
