@@ -10,13 +10,13 @@ G = 6.674e-11;
 year = 3.154e7;
 millenia = 1000*year;
 
-x0 = 149.513e9;
+x0 = 147e9;
 y0 = 0;
 vx0 = 0;
-vy0 = 29.78e3;
+vy0 = 30.3e3;
 
 initial = [x0; y0; vx0; vy0];
-tspan = [0 100000*31.536e6];
+tspan = [0 1000*31.536e6];
 %opts = odeset('RelTol',1e-2,'AbsTol',1e-4);
 opts = odeset('RelTol',1e-2,'AbsTol',1e-4, 'MaxStep', (1/1000)*year);
 [t,y] = ode45(func,tspan, initial, opts);

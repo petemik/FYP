@@ -15,35 +15,34 @@ uranus =    [2.7e12;    0;  0;  6.8e3];
 neptune =   [4.5e12;    0;  0;  5.4e3];
 masses = [  2e30; 
             0.33e24;
-            4.87e24;
-            5.97e24;
-            0.642e24;
-            1898e24;
-            568e24;
-            86.7e24;
-            102e24];
+            4.87e24];
+%             5.97e24;
+%             0.642e24;
+%             1898e24;
+%             568e24;
+%             86.7e24;
+%            102e24];
 initial = [ sun;
             mercury; 
-            venus; 
-            earth; 
-            mars; 
-            jupiter; 
-            saturn; 
-            uranus; 
-            neptune];
+            venus]; 
+%             earth; 
+%             mars; 
+%             jupiter; 
+%             saturn; 
+%             uranus; 
+%             neptune];
 
 %Perform in-built Runge-Kutta
 func = @(t, y) multiEqs(t, y, masses);
 end_time = 1*year;
 tspan = [0 end_time];
-opts = odeset('RelTol',1e-2,'AbsTol',1e-4, 'MaxStep', (1/1000)*year);
-[t,y] = ode45(func,tspan, initial, opts);
+[t,y] = rungeKutta(func,tspan, initial, 1/1000*year);
 
 %Plot orbits 
 hold on
 n_bodies = size(masses, 1);
 for i=0:n_bodies-1
-    plot(y(:,4*i+1), y(:,4*i+2))
+    plot(y(4*i+1,:), y(4*i+2, :))
 end
 legend('Sun', 'Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune')
 hold off
