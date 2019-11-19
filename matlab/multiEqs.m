@@ -8,25 +8,23 @@ for i = 0:n_bodies-1
     xx(i+1) = y(4*i + 1);
     yy(i+1) = y(4*i + 2);
 end
-%Remove first element
 G = 6.674e-11;
 
-% Here lets do a matrix of the different combinations
-% In the future for efficiency we will just fill in half and then take the
-% negative of it in the transpose (don't know if that makes sense)
+% Calculate forces
 Fx = zeros(n_bodies, n_bodies);
 Fy = zeros(n_bodies, n_bodies);
 for i=1:n_bodies
-    for j=1:n_bodies
-        if i ~= j
+    for j=(i+1):n_bodies
             Fx(i, j) = -G.*masses(i).*masses(j).*(xx(i)-xx(j)).*(((xx(i)-xx(j)).^2 ...
                                             + (yy(i)-yy(j)).^2).^(-3/2));
             Fy(i, j) = -G.*masses(i).*masses(j).*(yy(i)-yy(j)).*(((xx(i)-xx(j)).^2 ...
                                             + (yy(i)-yy(j)).^2).^(-3/2));
-        else
-        end
     end 
 end
+
+%Use transpose for reverse forces
+Fx = Fx - transpose(Fx);
+Fy = Fy - transpose(Fy);
 
 totalFx = sum(Fx, 2);
 totalFy = sum(Fy, 2);
@@ -38,4 +36,3 @@ for i = 0:n_bodies-1
     output(4*i+4) = totalFy(i+1)/masses(i+1);
 end
 end
-
