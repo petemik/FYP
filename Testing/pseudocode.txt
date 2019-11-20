@@ -1,0 +1,79 @@
+%Psuedocode to model many-body planetary systems using the 4th order Runge-Kutta method
+
+%Define equations of motion given by Newtons universal law of gravitation
+	
+	%multiEqs(t,y,masses) where y=[x1,y1,vx1,vy1,x2,y2,vx2,vy2,...]
+	Define	n_bodies = size_of_y/4
+			output_array of size 4*n_bodies
+			position arrays xx and yy of size n_bodies and populate with initial values
+			
+	Define	M = masses(1)
+			G = 6.674e-11
+			r = (xx.^2+yy.^2).^0.5
+			
+	%Create matrices of forces on each body
+	Define 	Fx and Fy as n_bodies*n_bodies
+	Loop 	through planets 1 to n_bodies
+				and through planets 1 to n_bodies excluding the selected planet
+					Fx(i, j) = -G*masses(j)*(xx(i)-xx(j))*(((xx(i)-xx(j))^2 ...
+                                            + (yy(i)-yy(j))^2)^(-3/2));
+					Fy(i, j) = -G*masses(j)*(yy(i)-yy(j))*(((xx(i)-xx(j))^2 ...
+                                            + (yy(i)-yy(j))^2)^(-3/2));
+	Define 	totalFx and totalFy as array size n_bodies
+			totalFx = sum of rows for Fx
+			totalFy = sum of rows for Fy
+	
+	Return	Loop planets
+				output(1) = vx
+				output(2) = vy
+				output(3) = -G*M*xx*r^-3 + totalFx
+				output(4) = -G*M*yy*r^-3 + totalFy
+				
+%Runge-Kutta method
+	
+	Define parameters 	(func, tspan, initial, stepsize)
+						
+	Define				n_eqs = size(initial, 1)
+						total_steps = time range/stepsize
+						time = vector size total_steps
+						solution = array size n_eqs by total_steps
+    
+	Initialise			solution line 1 = intial
+						time1 = tspan(1)
+    
+	Define 				Vectors size 4*n_eqs: k1,k2,k3,k4
+    
+	Loop between tspan(1) and tspan(2) by stepsize
+        Loop for total_steps
+            k1 = stepsize*func(t, solution(:, j))
+            k2 = stepsize*func(t + 0.5*stepsize, solution(:,j)+0.5.*k1)
+            k3 = stepsize*func(t + 0.5*stepsize, solution(:, j)+0.5.*k2)
+            k4 = stepsize*func(t + stepsize, solution(:, j) + k3)
+            solution(:, j+1) = solution(:, j) + (1/6)*(k1 + 2*k2 + 2*k3 + k4)
+            time(j+1) = t + stepsize
+
+	Output [time,solution]
+
+%System set-up / Runge-Kutta iterations / Plot
+
+	Define 	length_of_year
+			millenia
+			AU...
+			function = multiEqs(t,y)
+			
+	Set		planet#_ic = [x0,y0,vx0,vy0]
+			initial_conditions = [planet1_ic,planet2_ic,...]
+			masses = [mass1,mass2,...]
+			
+	%Runge-Kutta
+	Define 	end_time
+			timespan = [0..end_time]
+			options = (RelTol,AbsTol,MaxStep,...)
+	Output RK as [t,y] = ode45(func,tspan, initial, opts)
+	
+	%Plot
+	Loop through planets 1,2,...,n
+		plot(y[x],y[y])
+
+
+
