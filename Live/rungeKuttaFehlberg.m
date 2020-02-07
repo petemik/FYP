@@ -8,12 +8,6 @@ function [time, sol4] =rungeKuttaFehlberg(func, tspan, initial, max_stepsize, to
     sol4(:, 1) = initial';
     sol5(:, 1) = initial';
     time(1) = tspan(1);
-    k1=zeros(n_eqs*4,1);
-    k2=zeros(n_eqs*4,1);
-    k3=zeros(n_eqs*4,1);
-    k4=zeros(n_eqs*4,1);
-    k5=zeros(n_eqs*4,1);
-    k6=zeros(n_eqs*4,1);
     j=1;
     current_time=tspan(1);
     
