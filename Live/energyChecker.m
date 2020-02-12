@@ -34,7 +34,7 @@ initial = [ sun;
 
 %Perform in-built Runge-Kutta
 func = @(t, y) multiEqs(t, y, masses);
-end_time = 10*year;
+end_time = millenia;
 tspan = [0 end_time];
 stepsize = 1/5000*year;
 [t,y] = rungeKutta(func,tspan, initial, stepsize);
@@ -49,29 +49,30 @@ end
 % Sum to a total kinetic energy of the system
 total_T = sum(T);
 
-%Calculate potential energy, this is gonna be long
+% Calculate potential energy, this is gonna be long
 % Loop round this and do it for every element of the sytem maybe who tf
 % knows
-V = zeros(n_bodies, total_steps+1);
+V = zeros(n_bodies, n_bodies, total_steps+1);
 
 % First lets just do potential energy of the Sun
-for j=1:n_bodies
-    for i=1:n_bodies
-        if i~=j
-            V(i, :) = V + -G*masses(j)*masses(i)*...
-                ((y(1, :)- y(4*(i-1)+1, :)).^2 +(y(2, :)- y(4*(i-1)+2, :)).^2).^(-1/2);
-        end
+for i=1:n_bodies
+    for j=(i+1):n_bodies
+        V(i, j, :) = -G*masses(i)*masses(j)*...
+            ((y(4*(i-1)+1,:)- y(4*(j-1)+1, :)).^2 +(y(4*(i-1)+2, j, :)- y(4*(j-1)+2, :)).^2).^(-1/2);
     end
 end
-    
 
-
+total_V = sum(V, [1, 2]);
+total_V = reshape(total_V, [1, total_steps+1]);
+E = (total_T + total_V);
+delta_E = (E-E(1))./E(1);
+plot(delta_E*100);
 % 
 % %Plot orbits 
-% hold on
-% n_bodies = size(masses, 1);
-% for i=0:n_bodies-1
-%     plot(y(4*i+1,:), y(4*i+2, :))
-% end
-% legend('Sun', 'Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune')
-% hold off
+hold on
+n_bodies = size(masses, 1);
+for i=0:n_bodies-1
+    plot(y(4*i+1,:), y(4*i+2, :))
+end
+legend('Sun', 'Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune')
+hold off
