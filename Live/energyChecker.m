@@ -32,16 +32,25 @@ initial = [ sun;
             uranus; 
             neptune];
 
-%Perform in-built Runge-Kutta
+%Perform numerical method
 func = @(t, y) multiEqs(t, y, masses);
 end_time = millenia;
 tspan = [0 end_time];
-stepsize = 1/5000*year;
-[t,y] = rungeKutta(func,tspan, initial, stepsize);
-total_steps = ceil((tspan(2)-tspan(1))/stepsize);
-%NOT SURE WHY WE NEED +1 BUT APPARANTLY WE DO
+stepsize = (1/1000)*year;
+
+%CHANGE THIS FOR TESTING!!!
+tic
+%[t,y] = rungeKutta(func,tspan, initial, stepsize);
+[t,y] = rungeKuttaFehlberg(func, tspan, initial, stepsize,1e-6);
+% opts = odeset('RelTol',1e-2,'AbsTol',1e-4, 'MaxStep', stepsize);
+% [t,y] = ode45(func,tspan, initial, opts);
+% y = transpose(y);
+toc
+
+total_steps = size(y, 2);
 n_bodies = size(masses, 1);
-T = zeros(n_bodies, total_steps+1);
+T = zeros(n_bodies, total_steps);
+
 % Calculate the Kinetic Energy of each planet
 for i=0:n_bodies-1
     T(i+1, :) = 1/2*masses(i+1)*(y(4*i+3, :).^2 + y(4*i+4, :).^2);
@@ -49,30 +58,40 @@ end
 % Sum to a total kinetic energy of the system
 total_T = sum(T);
 
-% Calculate potential energy, this is gonna be long
-% Loop round this and do it for every element of the sytem maybe who tf
-% knows
-V = zeros(n_bodies, n_bodies, total_steps+1);
-
-% First lets just do potential energy of the Sun
+% Calculate potential energy
+V = zeros(n_bodies, n_bodies, total_steps);
 for i=1:n_bodies
     for j=(i+1):n_bodies
         V(i, j, :) = -G*masses(i)*masses(j)*...
             ((y(4*(i-1)+1,:)- y(4*(j-1)+1, :)).^2 +(y(4*(i-1)+2, j, :)- y(4*(j-1)+2, :)).^2).^(-1/2);
     end
 end
-
+% Sum to a total potential energy of the system
 total_V = sum(V, [1, 2]);
-total_V = reshape(total_V, [1, total_steps+1]);
-E = (total_T + total_V);
-delta_E = (E-E(1))./E(1);
-plot(delta_E*100);
-% 
-% %Plot orbits 
-hold on
-n_bodies = size(masses, 1);
+total_V = reshape(total_V, [1, total_steps]);
+
+% Calculate the angular momentum of each planet
+L = zeros(n_bodies, total_steps);
 for i=0:n_bodies-1
-    plot(y(4*i+1,:), y(4*i+2, :))
+    L(i+1, :) = masses(i+1)*(y(4*i+3, :).*y(4*i+2, :) - y(4*i+4, :).*y(4*i+1, :));
 end
-legend('Sun', 'Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune')
-hold off
+% Sum to a total angular momentum of the system
+total_L = sum(L);
+
+
+E = (total_T + total_V);
+percentage_E = ((E-E(1))./E(1))*100;
+percentage_L = ((total_L-total_L(1))./total_L(1))*100;
+
+%plots
+figure(1);
+plot(percentage_E);
+figure(2);
+plot(percentage_L);
+
+analysis(1,1)=max(percentage_E);
+analysis(2,1)=min(percentage_E);
+analysis(3,1)=mean(percentage_E);
+analysis(1,2)=max(percentage_L);
+analysis(2,2)=min(percentage_L);
+analysis(3,2)=mean(percentage_L);
