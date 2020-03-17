@@ -1,4 +1,5 @@
 % Define constants
+clear
 year = 3.154e7;
 millenia = 1000*year;
 
@@ -24,19 +25,24 @@ initial = [ sun;
             neptune];
 
 %Perform in-built Runge-Kutta
-tic
-func = @(t, y) multiEqs(t, y, masses);
-end_time = 100*year;
-tspan = [0 end_time];
-stepsize = (1/1000)*year;
-%[t,y] = rungeKuttaFehlberg56(func, tspan, initial, stepsize,1e-6);
-%[t,y] = rungeKutta(func, tspan, initial, stepsize);
-opts = odeset('RelTol',1e-2,'AbsTol',1e-4, 'MaxStep', stepsize);
-[t,y] = ode45(func,tspan, initial, opts);
-y = transpose(y);
-toc
+f = @(t, y) multiEqs(t, y, masses);
+tspan = [0 1000*year];
+H = 60*60*24*5;
+steps = ceil((tspan(2)-tspan(1))/H);
+kmax = 4;
+t0 = tspan(1);
+n_eqs = size(initial, 1);
+y = zeros(steps, n_eqs);
+y(1, :) = initial;
 
-%Plot orbits 
+tic
+for i=1:steps
+    small_tspan = [t0+(i-1)*H t0+i*H];
+    y(i+1, :) = BS1D(f, small_tspan, y(i, :), H, kmax);
+end
+toc
+y=y';
+%Plot orbits
 hold on
 n_bodies = size(initial, 1)/4;
 for i=0:n_bodies-1
