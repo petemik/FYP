@@ -8,7 +8,7 @@ mercury =   [46e9;      0;  0;  47.4e3];
 venus =     [108e9;     0;  0;  35.3e3];
 earth =     [147e9;     0;  0;  30.3e3];
 mars =      [206e9;     0;  0;  26.5e3];
-jupiter =   [-740e9;    0;  0;  -13.1e3];
+jupiter =   [740e9;     0;  0;  13.1e3];
 saturn =    [135e10;    0;  0;  9.7e3];
 uranus =    [2.7e12;    0;  0;  6.8e3];
 neptune =   [4.5e12;    0;  0;  5.4e3];
@@ -34,13 +34,10 @@ initial = [ sun;
 tic
 %Perform in-built Runge-Kutta
 func = @(t, y) multiEqs(t, y, masses);
-end_time = millenia;
+end_time = 10*year;
 tspan = [0 end_time];
 stepsize = (1/1000)*year;
-% [t,y] = rungeKuttaFehlberg56(func, tspan, initial, stepsize,1e-6);
-opts = odeset('RelTol',1e-2,'AbsTol',1e-4, 'MaxStep', stepsize);
-[t,y] = ode45(func,tspan, initial, opts);
-y = transpose(y);
+[t,y] = rungeKuttaFehlberg56(func, tspan, initial, stepsize,1e-6);
 %[t,y] = rungeKutta(func, tspan, initial, stepsize);
 toc
 
@@ -52,10 +49,8 @@ toc
 %Plot orbits 
 hold on
 n_bodies = size(masses, 1);
-% for i=0:n_bodies-1
-%     plot(y(4*i+1,:), y(4*i+2, :))
-% end
-rSun = (y(4*0+1,:).^2 + y(4*0+2, :).^2).^(1/2);
-plot(y(4*0+1,:), y(4*0+2, :))
+for i=0:n_bodies-1
+    plot(y(4*i+1,:), y(4*i+2, :))
+end
 legend('Sun', 'Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune')
 hold off

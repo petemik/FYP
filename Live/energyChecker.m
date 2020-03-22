@@ -9,7 +9,7 @@ mercury =   [54e9;      0;  0;  47.4e3];
 venus =     [108e9;     0;  0;  35.3e3];
 earth =     [147e9;     0;  0;  30.3e3];
 mars =      [206e9;     0;  0;  26.5e3];
-jupiter =   [700e9;     0;  0;  13.1e3];
+jupiter =   [740e9;     0;  0;  13.1e3];
 saturn =    [135e10;    0;  0;  9.7e3];
 uranus =    [2.7e12;    0;  0;  6.8e3];
 neptune =   [4.5e12;    0;  0;  5.4e3];
@@ -34,17 +34,17 @@ initial = [ sun;
 
 %Perform numerical method
 func = @(t, y) multiEqs(t, y, masses);
-end_time = 10*millenia;
+end_time = millenia;
 tspan = [0 end_time];
 stepsize = (1/1000)*year;
 
 %CHANGE THIS FOR TESTING!!!
 tic
 %[t,y] = rungeKutta(func,tspan, initial, stepsize);
-% [t,y] = rungeKuttaFehlberg(func, tspan, initial, stepsize,1e-6);
-opts = odeset('RelTol',1e-2,'AbsTol',1e-4, 'MaxStep', stepsize);
-[t,y] = ode45(func,tspan, initial, opts);
-y = transpose(y);
+[t,y] = rungeKuttaFehlberg(func, tspan, initial, stepsize,1e-6);
+% opts = odeset('RelTol',1e-2,'AbsTol',1e-4, 'MaxStep', stepsize);
+% [t,y] = ode45(func,tspan, initial, opts);
+% y = transpose(y);
 toc
 
 total_steps = size(y, 2);
@@ -84,14 +84,14 @@ percentage_E = ((E-E(1))./E(1))*100;
 percentage_L = ((total_L-total_L(1))./total_L(1))*100;
 
 %plots
-% figure(1);
-% plot(percentage_E);
-% figure(2);
-% plot(percentage_L);
+figure(1);
+plot(percentage_E);
+figure(2);
+plot(percentage_L);
 
-% analysis(1,1)=max(percentage_E);
-% analysis(2,1)=min(percentage_E);
-% analysis(3,1)=mean(percentage_E);
-% analysis(1,2)=max(percentage_L);
-% analysis(2,2)=min(percentage_L);
-% analysis(3,2)=mean(percentage_L);
+analysis(1,1)=max(percentage_E);
+analysis(2,1)=min(percentage_E);
+analysis(3,1)=mean(percentage_E);
+analysis(1,2)=max(percentage_L);
+analysis(2,2)=min(percentage_L);
+analysis(3,2)=mean(percentage_L);
