@@ -26,27 +26,27 @@ initial = [ sun;
 
 %Perform in-built Runge-Kutta
 f = @(t, y) multiEqs(t, y, masses);
-tspan = [0 1000*year];
-H = 60*60*24*5;
-steps = ceil((tspan(2)-tspan(1))/H);
-kmax = 4;
-t0 = tspan(1);
+end_time = 100*year;
+tspan = [0 end_time];
+kmax = 8;
+stepsize = 2592000;
 n_eqs = size(initial, 1);
-y = zeros(steps, n_eqs);
-y(1, :) = initial;
 
 tic
-for i=1:steps
-    small_tspan = [t0+(i-1)*H t0+i*H];
-    y(i+1, :) = BS1D(f, small_tspan, y(i, :), H, kmax);
-end
+    [t, y] = BS1DAdaptivev2(f, tspan, initial, stepsize, kmax,1E-10,1E-8);
 toc
-y=y';
+
+n = 100;
+y_slim = y(: , 1:n:end);
+t_slim = t(: , 1:n:end);
+writematrix(y_slim,'BS_'+string(stepsize)+'.csv');
+writematrix(t_slim,'BS_t_'+string(stepsize)+'.csv')
+
 %Plot orbits
-hold on
-n_bodies = size(initial, 1)/4;
-for i=0:n_bodies-1
-    plot(y(4*i+1,:), y(4*i+2,:))
-end
-legend('Sun', 'Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune')
-hold off
+% hold on
+% n_bodies = size(initial, 1)/4;
+% for i=0:n_bodies-1
+%     plot(y(4*i+1,:), y(4*i+2,:))
+% end
+% legend('Sun', 'Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune')
+% hold off

@@ -24,23 +24,30 @@ initial = [ sun;
             neptune];
 
 %Perform in-built Runge-Kutta
-tic
 func = @(t, y) multiEqs(t, y, masses);
 end_time = 100*year;
 tspan = [0 end_time];
-stepsize = (1/1000)*year;
-%[t,y] = rungeKuttaFehlberg56(func, tspan, initial, stepsize,1e-6);
-%[t,y] = rungeKutta(func, tspan, initial, stepsize);
-opts = odeset('RelTol',1e-2,'AbsTol',1e-4, 'MaxStep', stepsize);
-[t,y] = ode45(func,tspan, initial, opts);
-y = transpose(y);
-toc
+stepsize = 2592000;
+opts = odeset('RelTol',1e-8,'AbsTol',1e-10, 'MaxStep', stepsize);
 
-%Plot orbits 
-hold on
-n_bodies = size(initial, 1)/4;
-for i=0:n_bodies-1
-    plot(y(4*i+1,:), y(4*i+2,:))
-end
-legend('Sun', 'Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune')
-hold off
+tic
+    [t,y] = ode45(func,tspan, initial, opts);
+duration = toc;
+
+y = y';
+t=t';
+n = 100;
+y_slim = y(: , 1:n:end);
+t_slim = t(: , 1:n:end);
+writematrix(y_slim,'RK_'+string(stepsize)+'_'+string(duration)+'.csv');
+writematrix(t_slim,'RK_t_'+string(stepsize)+'_'+string(duration)+'.csv')
+
+% Plot orbits 
+% hold on
+% n_bodies = size(initial, 1)/4;
+% for i=0:n_bodies-1
+%     plot(y(4*i+1,:), y(4*i+2,:))
+% end
+% legend('Sun', 'Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune')
+% hold off
+
